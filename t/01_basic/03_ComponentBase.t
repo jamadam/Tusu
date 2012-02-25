@@ -2,15 +2,14 @@ package ComponentBase;
 use strict;
 use warnings;
 use lib 'lib';
-use base 'Test::Class';
 use Test::More;
 use Test::Mojo;
 
+	use Test::More tests => 33;
+	
     my $backup = $ENV{MOJO_MODE} || '';
-
-    __PACKAGE__->runtests;
     
-    sub param : Test(3) {
+    {
         $ENV{MOJO_MODE} = 'production';
         my $t = Test::Mojo->new('SomeApp');
         $t->get_ok('/03/03_ComponentBase01.html?key=value')
@@ -18,7 +17,7 @@ use Test::Mojo;
 			->content_is('value');
     }
     
-    sub post_param : Test(3) {
+    {
         $ENV{MOJO_MODE} = 'production';
         my $t = Test::Mojo->new('SomeApp');
         $t->post_form_ok('/03/03_ComponentBase02.html', {key => 'value2'})
@@ -26,7 +25,7 @@ use Test::Mojo;
 			->content_is('value2');
     }
     
-    sub url_for : Test(3) {
+    {
         $ENV{MOJO_MODE} = 'production';
         my $t = Test::Mojo->new('SomeApp');
         $t->get_ok('/03/03_ComponentBase03.html')
@@ -34,7 +33,7 @@ use Test::Mojo;
 			->content_is('/path/to/file path/to/file');
     }
     
-	sub redirect_to : Test(24) {
+	{
         $ENV{MOJO_MODE} = 'production';
         my $t = Test::Mojo->new('RedirectTo');
         $t->get_ok('/03/03_ComponentBase04.html?a=/hoge.html')
@@ -66,9 +65,7 @@ use Test::Mojo;
 			->header_like('Location' => qr{http://localhost:\d+/$});
 	}
 	
-    END {
-        $ENV{MOJO_MODE} = $backup;
-    }
+	$ENV{MOJO_MODE} = $backup;
 
 package SomeApp;
 use strict;

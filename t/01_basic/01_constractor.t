@@ -2,13 +2,12 @@ package Template_Basic;
 use strict;
 use warnings;
 use lib 'lib';
-use base 'Test::Class';
 use Test::More;
 use Test::Mojo;
 
-    __PACKAGE__->runtests;
+	use Test::More tests => 4;
     
-    sub constractor : Test(4) {
+    {
         
         my $app = Test::App->new;
         $app->plugin(tusu => {document_root => $app->home->rel_dir('../public_html')});

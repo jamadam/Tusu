@@ -1,28 +1,50 @@
-package ComponentBase_render;
 use strict;
 use warnings;
 use lib 'lib';
-use base 'Test::Class';
 use Test::More;
 use Test::Mojo;
 
     my $backup = $ENV{MOJO_MODE} || '';
 	
-	sub ini_basic : Test(6) {
+	use Test::More tests => 9;
+	
+	{
+		package IniTest;
+		use strict;
+		use warnings;
+		use base 'Tusu::ComponentBase';
+		__PACKAGE__->attr('foo');
+	}
+	{
 		my $tpl = Text::PSTemplate->new;
 		my $component = IniTest->new($tpl);
 		$component->foo('b');
 		is($component->foo, 'b', 'set attr');
 	}
-		{
-			package IniTest;
-			use strict;
-			use warnings;
-			use base 'Tusu::ComponentBase';
-			__PACKAGE__->attr('foo');
-		}
 	
-	sub ini_set : Test(2) {
+	{
+		package SomeComponent;
+		use strict;
+		use warnings;
+		use base 'Tusu::ComponentBase';
+			
+			__PACKAGE__->attr('key1');
+			__PACKAGE__->attr('app');
+			
+			my $inited;
+			
+			sub init {
+				my ($self, $app) = @_;
+				$self->key1('value1');
+				$self->app($app);
+			}
+		
+			sub get {
+				my ($self) = @_;
+				$self->controller->render(handler => 'tusu', template => '07/some_component/index2.html');
+			}
+	}
+	{
 		my $app = SomeApp2->new;
 	}
 		{
@@ -46,7 +68,7 @@ use Test::Mojo;
 				}
 		}
     
-    sub param : Test(6) {
+    {
         $ENV{MOJO_MODE} = 'production';
         my $t = Test::Mojo->new('SomeApp');
         $t->get_ok('/')
@@ -78,33 +100,7 @@ use Test::Mojo;
 					});
 				}
 		}
-	{
-		package SomeComponent;
-		use strict;
-		use warnings;
-		use base 'Tusu::ComponentBase';
-			
-			__PACKAGE__->attr('key1');
-			__PACKAGE__->attr('app');
-			
-			my $inited;
-			
-			sub init {
-				my ($self, $app) = @_;
-				$self->key1('value1');
-				$self->app($app);
-			}
-		
-			sub get {
-				my ($self) = @_;
-				$self->controller->render(handler => 'tusu', template => '07/some_component/index2.html');
-			}
-	}
     
-    END {
-        $ENV{MOJO_MODE} = $backup;
-    }
-
-    __PACKAGE__->runtests;
+	$ENV{MOJO_MODE} = $backup;
     
 __END__

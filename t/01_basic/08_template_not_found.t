@@ -2,15 +2,14 @@ package Template_Basic;
 use strict;
 use warnings;
 use lib 'lib';
-use base 'Test::Class';
 use Test::More;
 use Test::Mojo;
 
     my $backup = $ENV{MOJO_MODE} || '';
 
-    __PACKAGE__->runtests;
+	use Test::More tests => 32;
     
-    sub request_not_found : Test(3) {
+    {
         $ENV{MOJO_MODE} = 'production';
         my $t = Test::Mojo->new('SomeApp');
         $t->get_ok('/08/not_found.html')
@@ -18,7 +17,7 @@ use Test::Mojo;
 			->text_like('title', qr{Page not found}i);
     }
     
-    sub request_not_found2 : Test(3) {
+    {
         $ENV{MOJO_MODE} = 'development';
         my $t = Test::Mojo->new('SomeApp');
         $t->get_ok('/08/not_found.html')
@@ -26,7 +25,7 @@ use Test::Mojo;
 			->text_like('title', qr{Page not found}i);
     }
     
-    sub request_not_found3 : Test(3) {
+    {
         $ENV{MOJO_MODE} = 'production';
         my $t = Test::Mojo->new('SomeApp');
         $t->get_ok('/08/directory_index_fail/')
@@ -34,7 +33,7 @@ use Test::Mojo;
 			->text_like('title', qr{Page not found}i);
     }
     
-    sub request_not_found4 : Test(3) {
+    {
         $ENV{MOJO_MODE} = 'development';
         my $t = Test::Mojo->new('SomeApp');
         $t->get_ok('/08/directory_index_fail/')
@@ -42,7 +41,7 @@ use Test::Mojo;
 			->text_like('title', qr{Page not found}i);
     }
     
-    sub internal_not_found : Test(4) {
+    {
         $ENV{MOJO_MODE} = 'production';
         my $t = Test::Mojo->new('SomeApp');
         $t->get_ok('/08/')
@@ -51,7 +50,7 @@ use Test::Mojo;
             ->element_exists('div#raptor');
     }
     
-    sub internal_not_found2 : Test(5) {
+    {
         $ENV{MOJO_MODE} = 'development';
         my $t = Test::Mojo->new('SomeApp');
 		use File::Spec;
@@ -64,7 +63,7 @@ use Test::Mojo;
 			->content_like(qr{at \Q$expected2\E line 1});
     }
     
-    sub if_file_is_directory_then_301  : Test(8) {
+    {
         $ENV{MOJO_MODE} = 'development';
         my $t = Test::Mojo->new('SomeApp');
         $t->get_ok('/08/dir')
@@ -77,7 +76,7 @@ use Test::Mojo;
 			->header_like('location', qr{/08/});
     }
     
-    sub error_document_set : Test(4) {
+    {
         $ENV{MOJO_MODE} = 'production';
         my $t = Test::Mojo->new('ErrorDocument');
         $t->get_ok('/08/not_found.html')
@@ -85,9 +84,7 @@ use Test::Mojo;
 			->content_is('404');
     }
     
-    END {
-        $ENV{MOJO_MODE} = $backup;
-    }
+	$ENV{MOJO_MODE} = $backup;
 
 package SomeApp;
 use strict;

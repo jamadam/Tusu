@@ -2,15 +2,14 @@ package Template_Basic;
 use strict;
 use warnings;
 use lib 'lib';
-use base 'Test::Class';
 use Test::More;
 use Test::Mojo;
 
     my $backup = $ENV{MOJO_MODE} || '';
 
-    __PACKAGE__->runtests;
+	use Test::More tests => 24;
     
-    sub basic : Test(7) {
+    {
         $ENV{MOJO_MODE} = 'production';
         my $t = Test::Mojo->new('SomeApp');
         $t->get_ok('/09/img/a.gif')
@@ -22,7 +21,7 @@ use Test::Mojo;
 			->text_like('title', qr{Page not found}i);
     }
     
-    sub directory_indexed : Test(8) {
+    {
         $ENV{MOJO_MODE} = 'production';
         my $t = Test::Mojo->new('SomeApp2');
         $t->get_ok('/09/img/a.gif')
@@ -35,7 +34,7 @@ use Test::Mojo;
 			->content_like(qr/GIF89a/);
     }
     
-    sub bundle_files : Test(9) {
+    {
         $ENV{MOJO_MODE} = 'production';
         my $t = Test::Mojo->new('SomeApp2');
         $t->get_ok('/mojolicious-pinstripe.gif')
@@ -49,9 +48,7 @@ use Test::Mojo;
 			->header_is('Content-Type', 'application/x-javascript');
     }
     
-    END {
-        $ENV{MOJO_MODE} = $backup;
-    }
+	$ENV{MOJO_MODE} = $backup;
 
 package SomeApp;
 use strict;

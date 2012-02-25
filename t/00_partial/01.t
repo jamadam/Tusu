@@ -2,11 +2,12 @@ package Template_Basic;
 use strict;
 use warnings;
 use lib 'lib';
-use base 'Test::Class';
 use Test::More;
-use Tusu;
 use Test::Mojo;
+use Tusu;
     
+use Test::More tests => 13;
+
     BEGIN {
         chmod(0755, 't/00_partial/f/t01/permission_ok');
         chmod(0744, 't/00_partial/f/t01/permission_ng');
@@ -18,18 +19,18 @@ use Test::Mojo;
 
     my $backup = $ENV{MOJO_MODE} || '';
 
-	if ($^O !~ /MSWin32/) {
-		__PACKAGE__->runtests;
+	if ($^O eq "MSWin32") {
+		__PACKAGE__->SKIP_ALL("Test irrelevant on MSWin32");
 	}
     
-    sub t01_permission_ok : Test(4) {
+    {
         is(Tusu::_permission_ok('t/00_partial/f/t01/permission_ok/permission_ok.html'), 1);
         is(Tusu::_permission_ok('t/00_partial/f/t01/permission_ok/permission_ng.html'), 0);
         is(Tusu::_permission_ok('t/00_partial/f/t01/permission_ng/permission_ok.html'), 0);
         is(Tusu::_permission_ok('t/00_partial/f/t01/permission_ng/permission_ng.html'), 0);
     }
     
-    sub t02_fill_filename : Test(9) {
+    {
         is(Tusu::_fill_filename('t/00_partial/f/t02', ['index.html']), 't/00_partial/f/t02/index.html');
         is(Tusu::_fill_filename('t/00_partial/f/t02/', ['index.html']), 't/00_partial/f/t02/index.html');
         is(Tusu::_fill_filename('t/00_partial/f/t02/a', ['index.html']), 't/00_partial/f/t02/a/index.html');

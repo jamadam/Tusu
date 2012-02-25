@@ -2,7 +2,6 @@ package Template_Basic;
 use strict;
 use warnings;
 use lib 'lib';
-use base 'Test::Class';
 use Test::More;
 use Test::Mojo;
     
@@ -17,16 +16,13 @@ use Test::Mojo;
     
     my $backup = $ENV{MOJO_MODE} || '';
 
-	__PACKAGE__->runtests;
+	use Test::More tests => 11;
 	
-	sub no_tests_for_mswin : Test(setup) {
-		my $self = shift;
-		if ($^O eq "MSWin32") {
-			__PACKAGE__->SKIP_ALL("Test irrelevant on MSWin32");
-		}
-	};
+	if ($^O eq "MSWin32") {
+		__PACKAGE__->SKIP_ALL("Test irrelevant on MSWin32");
+	}
 
-    sub template_render : Test(8) {
+    {
 		
         $ENV{MOJO_MODE} = 'production';
         my $t = Test::Mojo->new('SomeApp');
@@ -36,7 +32,7 @@ use Test::Mojo;
         $t->get_ok('/10/permission_ng/permission_ng.html')->status_is(403);
     }
     
-    sub error_document_set : Test(3) {
+    {
 		
         $ENV{MOJO_MODE} = 'production';
         my $t = Test::Mojo->new('ErrorDocument');
@@ -45,9 +41,7 @@ use Test::Mojo;
 			->content_is('403');
     }
     
-    END {
-        $ENV{MOJO_MODE} = $backup;
-    }
+	$ENV{MOJO_MODE} = $backup;
 
 package SomeApp;
 use strict;

@@ -1,17 +1,15 @@
 package Template_Basic;
 use strict;
 use warnings;
-use base 'Test::Class';
 use Test::More;
 use Mojo::Template;
 use Text::PSTemplate;
 use Benchmark qw(countit) ;
 use Mojo::Util;
 
-    __PACKAGE__->runtests;
+	use Test::More tests => 4;
 	
-    sub template_engine : Test(4) {
-		
+    {
 		my $mt = Mojo::Template->new;
 		my $pst = Text::PSTemplate->new;
         $pst->set_filter('=', \&Mojo::Util::html_escape);
