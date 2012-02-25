@@ -37,6 +37,7 @@ use Test::Mojo;
 				my ($self, $app) = @_;
 				$self->key1('value1');
 				$self->app($app);
+				return $self;
 			}
 		
 			sub get {
@@ -62,7 +63,7 @@ use Test::Mojo;
 						},
 						document_root => $self->home->rel_dir('../public_html'),
 					});
-					my $SomeComponent = $tusu->engine->get_plugin('SomeComponent');
+					my $SomeComponent = $tusu->get_component('SomeComponent');
 					is($SomeComponent->key1, 'value1');
 					is($SomeComponent->app, $self);
 				}

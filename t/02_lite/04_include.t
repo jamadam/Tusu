@@ -13,7 +13,7 @@ use Mojolicious::Lite;
 
 use Test::More tests => 12;
     my $tusu = plugin tusu => {
-		document_root => 't/public_html',
+        document_root => 't/public_html',
     };
     my $t = Test::Mojo->new;
     $t->get_ok('/04/')->status_is(200)->content_is('sub ok');

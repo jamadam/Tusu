@@ -14,11 +14,11 @@ use Mojolicious::Lite;
 use Test::More tests => 6;
 
     my $tusu = plugin tusu => {
-		components => {
-			'SomeComponent' => undef,
-		},
-		document_root => 't/public_html',
-	};
+        components => {
+            'SomeComponent' => undef,
+        },
+        document_root => 't/public_html',
+    };
     
     my $r = app->routes;
     $r->route('/07/some_component/index2.html')->to(cb => sub {

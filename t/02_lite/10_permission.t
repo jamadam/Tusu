@@ -10,13 +10,13 @@ use lib 'lib';
 use Test::More;
 use Test::Mojo;
 use Mojolicious::Lite;
-	
-	if( $^O eq 'MSWin32' ) {
-		plan skip_all => 'Test irrelevant on MSWin32';
-	}
-	else {
-		plan tests => 11;
-	}
+    
+    if( $^O eq 'MSWin32' ) {
+        plan skip_all => 'Test irrelevant on MSWin32';
+    }
+    else {
+        plan tests => 11;
+    }
     
     BEGIN {
         chmod(0755, 't/00_partial/f/t01/permission_ok');
@@ -35,16 +35,16 @@ use Mojolicious::Lite;
     $t->get_ok('/10/permission_ng/permission_ok.html')->status_is(403);
     $t->get_ok('/10/permission_ng/permission_ng.html')->status_is(403);
 
-	$tusu->error_document({
-		404 => '/08/err/404.html',
-		403 => '/08/err/403.html',
-		500 => '/08/err/500.html',
-	});
-	
-	$t->get_ok('/10/permission_ng/permission_ng.html')
-		->status_is(403)
-		->content_is('403');
-	
+    $tusu->error_document({
+        404 => '/08/err/404.html',
+        403 => '/08/err/403.html',
+        500 => '/08/err/500.html',
+    });
+    
+    $t->get_ok('/10/permission_ng/permission_ng.html')
+        ->status_is(403)
+        ->content_is('403');
+    
     $ENV{MOJO_MODE} = $backup;
 
 __END__

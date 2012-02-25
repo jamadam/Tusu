@@ -12,7 +12,9 @@ use base qw(Text::PSTemplate::PluginBase);
     sub new {
         my $class = shift;
         my $self = $class->SUPER::new(@_);
-        $self->init($Tusu::APP);
+		if ($Tusu::APP) {
+			$self->init($Tusu::APP);
+		}
         return $self;
     }
     

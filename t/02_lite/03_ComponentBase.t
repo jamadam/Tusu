@@ -14,11 +14,11 @@ use Mojolicious::Lite;
 use Test::More tests => 9;
 
     my $tusu = plugin tusu => {
-		components => {
-			'SomeComponent' => undef,
-		},
-		document_root => 't/public_html',
-	};
+        components => {
+            'SomeComponent' => undef,
+        },
+        document_root => 't/public_html',
+    };
     
     any '/03/03_ComponentBase02.html' => sub {
         $tusu->bootstrap($_[0], 'SomeComponent', 'post');
@@ -26,14 +26,14 @@ use Test::More tests => 9;
     
     my $t = Test::Mojo->new;
     $t->get_ok('/03/03_ComponentBase01.html?key=value')
-		->status_is(200)
-		->content_is('value');
+        ->status_is(200)
+        ->content_is('value');
     $t->post_form_ok('/03/03_ComponentBase02.html', {key => 'value2'})
-		->status_is(200)
-		->content_is('value2');
+        ->status_is(200)
+        ->content_is('value2');
     $t->get_ok('/03/03_ComponentBase03.html')
-		->status_is(200)
-		->content_is('/path/to/file path/to/file');
+        ->status_is(200)
+        ->content_is('/path/to/file path/to/file');
 
     $ENV{MOJO_MODE} = $backup;
 

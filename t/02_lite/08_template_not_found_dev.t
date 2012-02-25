@@ -13,24 +13,24 @@ use Mojolicious::Lite;
 use Test::More tests => 11;
 
     my $tusu = plugin tusu => {
-		document_root => 't/public_html',
+        document_root => 't/public_html',
     };
     
     my $t = Test::Mojo->new;
     $t->get_ok('/08/not_found.html')
-		->status_is(404)
-		->text_like('title', qr{Page not found}i);
+        ->status_is(404)
+        ->text_like('title', qr{Page not found}i);
     use File::Spec;
     my $expected1 = File::Spec->catfile(qw(t public_html 08 not_exist.html));
     my $expected2 = File::Spec->catfile(qw(t public_html 08 index.html));
     $t->get_ok('/08/')
-		->status_is(500)
-		->text_like('title', qr{Server error}i)
-		->content_like(qr{\Q$expected1\E})
-		->content_like(qr{at \Q$expected2\E line 1});
-	$t->get_ok('/08/directory_index_fail/')
-		->status_is(404)
-		->text_like('title', qr{Page not found}i);
+        ->status_is(500)
+        ->text_like('title', qr{Server error}i)
+        ->content_like(qr{\Q$expected1\E})
+        ->content_like(qr{at \Q$expected2\E line 1});
+    $t->get_ok('/08/directory_index_fail/')
+        ->status_is(404)
+        ->text_like('title', qr{Page not found}i);
 
     $ENV{MOJO_MODE} = $backup;
 
