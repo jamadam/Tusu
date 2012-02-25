@@ -1,0 +1,15 @@
+.*
+!.gitignore
+!.perltidyrc
+!.htaccess
+*~
+blib
+Makefile*
+!Makefile.PL
+*META.yml
+*MYMETA.yml
+*MYMETA.json
+#MANIFEST*
+#!MANIFEST.SKIP
+pm_to_blib
+*bak
