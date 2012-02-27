@@ -59,18 +59,16 @@ our $VERSION = '0.39';
             die qq{Document root "$args->{document_root}" is not a directory};
         }
         
-        $app->hook(after_build_tx => sub {
-            my $app = $_[1];
+        $app->hook('around_dispatch' => sub {
             if (! $self->_default_route_set) {
                 $self->_default_route_set(1);
-                $app->routes
+                $_[1]->app->routes
                     ->route('/:template', template => qr{.*})
                     ->name('')
                     ->to(cb => sub {$_[0]->render(handler => 'tusu')});
             }
+            $self->_dispatch($_[1])
         });
-        
-        $app->hook('around_dispatch' => sub {$self->_dispatch($_[1])});
         
         $app->static->paths([$args->{document_root}, $self->_asset]);
         $app->renderer->paths([$args->{document_root}]);
