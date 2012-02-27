@@ -70,11 +70,7 @@ our $VERSION = '0.39';
             }
         });
         
-        $app->hook('around_dispatch' => sub {
-            my ($next, $c) = @_;
-            $self->_dispatch($c->app, $c);
-            $next->();
-        });
+        $app->hook('around_dispatch' => sub {$self->_dispatch($_[1])});
         
         $app->static->paths([$args->{document_root}, $self->_asset]);
         $app->renderer->paths([$args->{document_root}]);
@@ -109,6 +105,9 @@ our $VERSION = '0.39';
         return $self;
     }
     
+    ### ---
+    ### Get component
+    ### ---
     sub get_component {
         my ($self, $name) = @_;
         return $self->engine->get_plugin($name);
@@ -127,7 +126,8 @@ our $VERSION = '0.39';
     ### Custom dispatcher
     ### ---
     sub _dispatch {
-        my ($self, $app, $c) = @_;
+        my ($self, $c) = @_;
+        my $app = $c->app;
         
         my $tx = $c->tx;
         if ($tx->is_websocket) {
@@ -212,18 +212,27 @@ our $VERSION = '0.39';
         return File::Spec->catdir(dirname(__FILE__), 'Tusu', 'Asset');
     }
     
+    ### ---
+    ### Guess type by file extension
+    ### ---
     sub _file_to_mime_class {
         my $name = shift;
         my $ext = ($name =~ qr{\.(\w+)$}) ? $1 : '';
         return (split('/', Mojolicious::Types->type($ext) || 'text/plain'))[0];
     }
     
+    ### ---
+    ### Get file utime
+    ### ---
     sub _file_timestamp {
         my $path = shift;
         my @dt = localtime((stat($path))[9]);
         return sprintf('%d-%02d-%02d %02d:%02d', 1900 + $dt[5], $dt[4] + 1, $dt[3], $dt[2], $dt[1]);
     }
     
+    ### ---
+    ### Get file size
+    ### ---
     sub _file_size {
         my $path = shift;
         return ((stat($path))[7] > 1024)
