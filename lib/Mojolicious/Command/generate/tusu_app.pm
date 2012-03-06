@@ -132,50 +132,6 @@ sub find_lib {
     return;
 }
 
-sub bundle_dist {
-    my ($self, $class, $dist_name) = @_;
-    my @libs = eval {
-        _get_lib_names($dist_name);
-    };
-    if ($@) {
-        warn $@;
-    } else {
-        for my $modules (@libs) {
-            $self->bundle_lib($class, $modules);
-        }
-        print "  [bundle distribution] $dist_name\n";
-        return $self;
-    }
-}
-
-sub _get_lib_names {
-    my $dist = shift;
-    my $uri = "http://cpanmetadb.appspot.com/v1.0/package/$dist";
-    if (my $yaml = LWP::Simple::get($uri)) {
-        if ($yaml =~ qr{distfile:\s+(.+)\-[\d\.]+\.tar.gz}) {
-            my @paths = split(qr{/}, $1);
-            my $path = (uc $paths[-2]). '/'. $paths[-1];
-            no strict 'refs';
-            my $dist_file = $dist;
-            $dist_file =~ s{::}{/}g;
-            eval {
-                require "$dist_file.pm"; ## no critic
-            };
-            my $ver = ${"$dist\::VERSION"};
-            my $uri2 = "http://cpansearch.perl.org/src/$path-$ver/MANIFEST";
-            if (my $manifest = LWP::Simple::get($uri2)) {
-                return
-                    map {my $a = $_; $a =~ s{^lib/}{}; $a}
-                    grep {$_ =~ qr{^lib/}}
-                    split(qr{\s+}s, $manifest);
-            } else {
-                die qq{Can't find manifest for $dist via CPAN (maybe your libs are too old?)."
-                    ."\nPlease copy your libs into extlib directorymanualy};
-            }
-        }
-    }
-}
-
 1;
 
 __END__
@@ -228,10 +184,6 @@ L<Mojo::Command> and implements the following new ones.
 Not written yet.
 
 =head2 C<render_to_rel_file>
-
-Not written yet.
-
-=head2 C<bundle_dist>
 
 Not written yet.
 

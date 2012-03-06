@@ -13,7 +13,6 @@ my %params = (
     BUILD_REQUIRES => {
         'Test::More'          => '0.47',
         'Test::UseAllModules' => '0.10',
-        'LWP::Simple'    	  => '0',
         'Mojolicious'    	  => '2.52',
         'Attribute::Handlers' => '0.91',
         'Try::Tiny'           => '0.11',
