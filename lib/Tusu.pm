@@ -10,7 +10,7 @@ use File::Basename;
 use File::Spec;
 use Mojolicious::Types;
 use Mojo::Util 'url_unescape';
-our $VERSION = '0.39';
+our $VERSION = '0.02';
 
     our $APP;
     our $CONTROLLER;

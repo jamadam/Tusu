@@ -1,4 +1,8 @@
 Revision history for Tusu
 
+0.02 2012/03/07
+  - Upgraded Text::PSTemplate to v0.47
+  - Fixed version number
+
 0.01 2012/02/25
   - Initial release 
