@@ -2,8 +2,6 @@ package Mojolicious::Plugin::Tusu;
 use strict;
 use warnings;
 use Mojo::Base 'Tusu';
-
-    __PACKAGE__->attr('tusu');
     
     sub register {
         return shift->SUPER::register(@_);
