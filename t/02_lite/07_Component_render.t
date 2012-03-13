@@ -13,7 +13,7 @@ use Mojolicious::Lite;
 
 use Test::More tests => 6;
 
-    my $tusu = plugin tusu => {
+    my $tusu = plugin TusuRenderer => {
         components => {
             'SomeComponent' => undef,
         },

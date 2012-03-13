@@ -13,7 +13,9 @@ use Mojolicious::Lite;
     
 use Test::More tests => 9;
 
-    my $tusu = plugin 'tusu' => {document_root => 't/public_html'};
+    my $tusu = plugin 'TusuRenderer' => {
+        document_root => 't/public_html'
+    };
     
     my $t = Test::Mojo->new;
     $t->get_ok('/')

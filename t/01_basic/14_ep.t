@@ -7,20 +7,14 @@ use Test::Mojo;
 
     my $backup = $ENV{MOJO_MODE} || '';
     
-	use Test::More tests => 9;
+	use Test::More tests => 3;
     
     {
         $ENV{MOJO_MODE} = 'production';
         my $t = Test::Mojo->new('SomeApp');
-        $t->get_ok('/')
+        $t->get_ok('/index.html')
 			->status_is(200)
-			->content_is('default');
-        $t->get_ok('/02/')
-			->status_is(200)
-			->content_is('default');
-        $t->get_ok('/02/02_02.html')
-			->status_is(200)
-			->content_is('ok02_02');
+			->content_is("/14\n");
     }
     
 	$ENV{MOJO_MODE} = $backup;
@@ -32,9 +26,9 @@ use base 'Mojolicious';
 
 sub startup {
     my $self = shift;
-	$self->plugin(TusuRenderer => {
-		document_root 	=> 't/public_html',
-		renderer 		=> 'tusu',
+	$self->plugin(TusuEPRenderer => {
+		document_root 	=> 't/public_html/14',
+		renderer		=> 'tusu_ep',
 	});
 }
 

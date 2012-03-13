@@ -93,7 +93,7 @@ use base 'Mojolicious';
 
 sub startup {
     my $self = shift;
-    my $tusu = $self->plugin(tusu => {document_root => 't/public_html'});
+    $self->plugin(TusuRenderer => {document_root => 't/public_html'});
 }
 
 package ErrorDocument;
@@ -103,7 +103,7 @@ use base 'Mojolicious';
 
 sub startup {
     my $self = shift;
-    my $tusu = $self->plugin(tusu => {
+    $self->plugin(TusuRenderer => {
 		document_root => 't/public_html',
 		error_document => {
 			404 => '/08/err/404.html',

@@ -12,7 +12,7 @@ use Test::Mojo;
 use Mojolicious::Lite;
 use Test::More tests => 11;
 
-    my $tusu = plugin tusu => {
+    my $tusu = plugin TusuRenderer => {
         document_root => 't/public_html',
     };
     

@@ -12,7 +12,7 @@ use Test::Mojo;
 use Mojolicious::Lite;
 
 use Test::More tests => 6;
-    my $tusu = plugin tusu => {
+    my $tusu = plugin TusuRenderer => {
         document_root => 't/public_html/06',
         extensions_to_render => [qw(html htm xml txt)],
     };

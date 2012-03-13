@@ -42,12 +42,10 @@ use Encode::Guess;
 			
 			sub startup {
 				my $self = shift;
-				my $tusu = $self->plugin(
-					tusu => {
+				$self->plugin(TusuRenderer => {
 						document_root => 't/public_html/13',
 						indexes			=> 1,
-					}
-				);
+				});
 			}
 		}
 	

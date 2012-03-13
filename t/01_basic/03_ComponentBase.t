@@ -1,7 +1,6 @@
 package ComponentBase;
 use strict;
 use warnings;
-use lib 'lib';
 use Test::More;
 use Test::Mojo;
 
@@ -83,11 +82,11 @@ use base 'Mojolicious';
     sub startup {
         my $self = shift;
     
-        my $tusu = $self->plugin(tusu => {
+        my $tusu = $self->plugin(TusuRenderer => {
+            document_root => 't/public_html',
             components => {
                 'SomeComponent' => undef,
             },
-            document_root => 't/public_html',
         });
         my $r = $self->routes;
         $r->route('/03/03_ComponentBase02.html')->to(cb => sub {
@@ -103,12 +102,12 @@ use base 'Mojolicious';
     sub startup {
         my $self = shift;
     
-        my $tusu = $self->plugin(tusu => {
+        my $tusu = $self->plugin(TusuRenderer => {
+            document_root => 't/public_html',
             components => {
                 'SomeComponent' => undef,
                 'SomeComponent2' => undef,
             },
-            document_root => 't/public_html',
         });
         my $r = $self->routes;
         $r->route('/03/03_ComponentBase04.html')->to(cb => sub {

@@ -15,12 +15,12 @@ our $VERSION = '0.02';
     our $APP;
     our $CONTROLLER;
     
-    __PACKAGE__->attr('engine');
     __PACKAGE__->attr('extensions_to_render');
     __PACKAGE__->attr('directory_index');
     __PACKAGE__->attr('error_document');
     __PACKAGE__->attr('document_root');
     __PACKAGE__->attr('indexes');
+    __PACKAGE__->attr('handler');
     
     # internal use
     __PACKAGE__->attr('_default_route_set');
@@ -41,13 +41,16 @@ our $VERSION = '0.02';
         
         my $default_args = {
             document_root           => $app->home->rel_dir('public_html'),
-            encoding                => 'utf8',
             extensions_to_render    => ['html','htm','xml'],
             directory_index         => ['index.html','index.htm'],
             error_document          => {},
-            components              => {},
             indexes                 => 0,
+            renderer                => 'tusu',
+            encoding                => 'utf8',
+            components              => {},
         };
+        
+        $args = {%$default_args, %$args};
         
         if (my $key = _check_hash_key($args, keys %$default_args)) {
             croak "Unknown argument $key";
@@ -65,7 +68,9 @@ our $VERSION = '0.02';
                 $_[1]->app->routes
                     ->route('/:template', template => qr{.*})
                     ->name('')
-                    ->to(cb => sub {$_[0]->render(handler => 'tusu')});
+                    ->to(cb => sub {
+                        $_[0]->render(handler => $self->handler);
+                    });
             }
             $self->_dispatch($_[1])
         });
@@ -73,51 +78,14 @@ our $VERSION = '0.02';
         $app->static->paths([$args->{document_root}, $self->_asset]);
         $app->renderer->paths([$args->{document_root}]);
         
-        my $engine = Text::PSTemplate->new;
-        $engine->set_filter('=', \&Mojo::Util::html_escape);
-        $engine->set_filename_trans_coderef(sub {
-            _filename_trans($args->{document_root}, $args->{directory_index}, @_);
-        });
-        
-        {
-            local $APP = $app;
-            $engine->plug(
-                'Tusu::ComponentBase'            => undef,
-                'Tusu::Component::Util'          => '',
-                'Tusu::Component::Mojolicious'   => 'Mojolicious',
-                %{$args->{components}}
-            );
-        }
-        
-        $engine->set_encoding($args->{encoding});
-        
-        $self->engine($engine);
+        $self->handler($args->{renderer});
         $self->directory_index($args->{directory_index});
         $self->error_document($args->{error_document});
         $self->extensions_to_render($args->{extensions_to_render});
         $self->document_root($args->{document_root});
         $self->indexes($args->{indexes});
         
-        $app->renderer->add_handler(tusu => sub { $self->_render(@_) });
-        
         return $self;
-    }
-    
-    ### ---
-    ### Get component
-    ### ---
-    sub get_component {
-        my ($self, $name) = @_;
-        return $self->engine->get_plugin($name);
-    }
-    
-    ### ---
-    ### bootstrap for frameworking
-    ### ---
-    sub bootstrap {
-        my ($self, $c, $component, $action, @args) = @_;
-        local $CONTROLLER = $c;
-        return $self->engine->get_plugin($component)->$action(@args);
     }
     
     ### ---
@@ -339,32 +307,6 @@ our $VERSION = '0.02';
     }
     
     ### ---
-    ### foo/bar.html    -> public_html/foo/bar.html
-    ### foo/            -> public_html/foo/index.html
-    ### foo             -> public_html/foo
-    ### ---
-    sub _filename_trans {
-        my ($template_base, $directory_index, $name) = @_;
-        $name ||= '';
-        my $leading_slash = substr($name, 0, 1) eq '/';
-        my $trailing_slash = substr($name, -1, 1) eq '/';
-        $name =~ s{^/}{};
-        my $dir;
-        if ($leading_slash) {
-            $dir = $template_base;
-        } else {
-            $dir = (File::Spec->splitpath(Text::PSTemplate->get_current_filename))[1];
-        }
-        my $path = File::Spec->catfile($dir, $name);
-        if ($trailing_slash) {
-            if (my $fixed_path = _fill_filename($path, $directory_index)) {
-                return $fixed_path;
-            }
-        }
-        return $path;
-    }
-    
-    ### ---
     ### Check if others readable
     ### ---
     sub _permission_ok {
@@ -390,24 +332,29 @@ our $VERSION = '0.02';
     }
     
     ### ---
-    ### tusu renderer
+    ### foo/bar.html    -> public_html/foo/bar.html
+    ### foo/            -> public_html/foo/index.html
+    ### foo             -> public_html/foo
     ### ---
-    sub _render {
-        my ($self, $renderer, $c, $output, $options) = @_;
-        
-        try {
-            local $SIG{__DIE__} = undef;
-            local $CONTROLLER = $c;
-            $$output = Text::PSTemplate ->new($self->engine)
-                                        ->parse_file('/'. $options->{template});
-        } catch {
-            my $err = $_ || 'Unknown Error';
-            $c->app->log->error(qq(Template error in "$options->{template}": $err));
-            $self->_render_error_document($c, 500, "$err");
-            $$output = '';
-            return 0;
-        };
-        return 1;
+    sub _filename_trans {
+        my ($template_base, $directory_index, $name) = @_;
+        $name ||= '';
+        my $leading_slash = substr($name, 0, 1) eq '/';
+        my $trailing_slash = substr($name, -1, 1) eq '/';
+        $name =~ s{^/}{};
+        my $dir;
+        if ($leading_slash) {
+            $dir = $template_base;
+        } else {
+            $dir = (File::Spec->splitpath(Text::PSTemplate->get_current_filename))[1];
+        }
+        my $path = File::Spec->catfile($dir, $name);
+        if ($trailing_slash) {
+            if (my $fixed_path = _fill_filename($path, $directory_index)) {
+                return $fixed_path;
+            }
+        }
+        return $path;
     }
 
 1;

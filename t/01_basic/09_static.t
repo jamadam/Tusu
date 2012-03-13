@@ -57,7 +57,9 @@ use base 'Mojolicious';
 
 sub startup {
     my $self = shift;
-    my $tusu = $self->plugin(tusu => {document_root => $self->home->rel_dir('../public_html')});
+    my $tusu = $self->plugin(TusuRenderer => {
+		document_root => $self->home->rel_dir('../public_html')
+	});
 }
 
 package SomeApp2;
@@ -67,7 +69,7 @@ use base 'Mojolicious';
 
 sub startup {
     my $self = shift;
-    my $tusu = $self->plugin(tusu => {
+    my $tusu = $self->plugin(TusuRenderer => {
 		document_root => $self->home->rel_dir('../public_html'),
 		directory_index => ['a.gif'],
 	});

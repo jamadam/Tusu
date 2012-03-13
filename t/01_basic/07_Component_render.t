@@ -57,11 +57,11 @@ use Test::Mojo;
 				
 				sub startup {
 					my $self = shift;
-					my $tusu = $self->plugin(tusu => {
+					my $tusu = $self->plugin(TusuRenderer => {
+						document_root => $self->home->rel_dir('../public_html'),
 						components => {
 							'SomeComponent' => undef,
 						},
-						document_root => $self->home->rel_dir('../public_html'),
 					});
 					my $SomeComponent = $tusu->get_component('SomeComponent');
 					is($SomeComponent->key1, 'value1');
@@ -88,11 +88,11 @@ use Test::Mojo;
 				sub startup {
 					my $self = shift;
 				
-					my $tusu = $self->plugin(tusu => {
+					my $tusu = $self->plugin(TusuRenderer => {
+						document_root => 't/public_html',
 						components => {
 							'SomeComponent' => undef,
 						},
-						document_root => 't/public_html'
 					});
 					
 					my $r = $self->routes;

@@ -13,7 +13,7 @@ use Mojolicious::Lite;
 
 use Test::More tests => 24;
 
-    my $tusu = plugin tusu => {
+    my $tusu = plugin TusuRenderer => {
         document_root => app->home->rel_dir('../public_html'),
         directory_index => ['a.gif'],
     };
