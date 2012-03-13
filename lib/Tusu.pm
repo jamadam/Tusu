@@ -10,6 +10,7 @@ use File::Basename;
 use File::Spec;
 use Mojolicious::Types;
 use Mojo::Util 'url_unescape';
+use Scalar::Util qw(weaken);
 our $VERSION = '0.02';
 
     our $APP;
@@ -20,10 +21,18 @@ our $VERSION = '0.02';
     __PACKAGE__->attr('error_document');
     __PACKAGE__->attr('document_root');
     __PACKAGE__->attr('indexes');
-    __PACKAGE__->attr('handler');
     
-    # internal use
-    __PACKAGE__->attr('_default_route_set');
+    sub default_args {
+        my ($class, $app) = @_;
+        return {
+            document_root           => $app->home->rel_dir('public_html'),
+            extensions_to_render    => ['html','htm','xml'],
+            directory_index         => ['index.html','index.htm'],
+            error_document          => {},
+            indexes                 => 0,
+            renderer                => 'tusu',
+        }
+    }
     
     sub _check_hash_key {
         my ($hash_ref, @keys) = @_;
@@ -39,46 +48,35 @@ our $VERSION = '0.02';
     sub register {
         my ($self, $app, $args) = @_;
         
-        my $default_args = {
-            document_root           => $app->home->rel_dir('public_html'),
-            extensions_to_render    => ['html','htm','xml'],
-            directory_index         => ['index.html','index.htm'],
-            error_document          => {},
-            indexes                 => 0,
-            renderer                => 'tusu',
-            encoding                => 'utf8',
-            components              => {},
-        };
+        $args = {%{$self->default_args($app)}, %$args};
         
-        $args = {%$default_args, %$args};
-        
-        if (my $key = _check_hash_key($args, keys %$default_args)) {
+        if (my $key = _check_hash_key($args, keys %$args)) {
             croak "Unknown argument $key";
         }
-        
-        $args = {%$default_args, %$args};
         
         if (! -d $args->{document_root}) {
             die qq{Document root "$args->{document_root}" is not a directory};
         }
         
+        my $tusu_default_route_set;
+        
         $app->hook('around_dispatch' => sub {
-            if (! $self->_default_route_set) {
-                $self->_default_route_set(1);
+            my $app = $_[1]->app;
+            if (! $tusu_default_route_set) {
+                $tusu_default_route_set = 1;
                 $_[1]->app->routes
                     ->route('/:template', template => qr{.*})
                     ->name('')
                     ->to(cb => sub {
-                        $_[0]->render(handler => $self->handler);
+                        $_[0]->render(handler => $args->{renderer});
                     });
             }
-            $self->_dispatch($_[1])
+            $self->_dispatch($_[1]);
         });
         
         $app->static->paths([$args->{document_root}, $self->_asset]);
         $app->renderer->paths([$args->{document_root}]);
         
-        $self->handler($args->{renderer});
         $self->directory_index($args->{directory_index});
         $self->error_document($args->{error_document});
         $self->extensions_to_render($args->{extensions_to_render});
@@ -272,9 +270,9 @@ our $VERSION = '0.02';
     ### ---
     ### fill directory_index candidate
     ### ---
-    sub _fill_filename {
-        my ($path, $directory_index) = @_;
-        for my $default (@{$directory_index}) {
+    sub fill_filename {
+        my ($self, $path) = @_;
+        for my $default (@{$self->directory_index}) {
             my $path = File::Spec->catfile($path, $default);
             if (-f $path) {
                 return $path;
@@ -297,7 +295,7 @@ our $VERSION = '0.02';
             return {type => 'file', path => $path};
         }
         if ($trailing_slash) {
-            if (my $fixed_path = _fill_filename($path, $self->directory_index)) {
+            if (my $fixed_path = $self->fill_filename($path)) {
                 return {type => 'file', path => $fixed_path};
             }
         } elsif (-d $path) {
@@ -336,8 +334,8 @@ our $VERSION = '0.02';
     ### foo/            -> public_html/foo/index.html
     ### foo             -> public_html/foo
     ### ---
-    sub _filename_trans {
-        my ($template_base, $directory_index, $name) = @_;
+    sub filename_trans {
+        my ($self, $template_base, $name) = @_;
         $name ||= '';
         my $leading_slash = substr($name, 0, 1) eq '/';
         my $trailing_slash = substr($name, -1, 1) eq '/';
@@ -350,7 +348,7 @@ our $VERSION = '0.02';
         }
         my $path = File::Spec->catfile($dir, $name);
         if ($trailing_slash) {
-            if (my $fixed_path = _fill_filename($path, $directory_index)) {
+            if (my $fixed_path = $self->fill_filename($path)) {
                 return $fixed_path;
             }
         }

@@ -5,8 +5,18 @@ use Try::Tiny;
 use Text::PSTemplate;
 use Mojo::Base 'Tusu';
 use Carp;
+use Scalar::Util qw(weaken);
 
     __PACKAGE__->attr('engine');
+    
+    sub default_args {
+        my $class = shift;
+        return {
+            %{$class->SUPER::default_args(@_)},
+            encoding                => 'utf8',
+            components              => {},
+        }
+    }
     
     sub register {
         my ($self, $app, $args) = @_;
@@ -16,7 +26,7 @@ use Carp;
         my $engine = Text::PSTemplate->new;
         $engine->set_filter('=', \&Mojo::Util::html_escape);
         $engine->set_filename_trans_coderef(sub {
-            Tusu::_filename_trans($app->static->paths->[0], $self->directory_index, @_);
+            $self->filename_trans($app->static->paths->[0], @_);
         });
         
         {
@@ -48,6 +58,8 @@ use Carp;
             };
             return 1;
         });
+        
+        weaken $self;
         
         return $self;
     }

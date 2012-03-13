@@ -18,7 +18,7 @@ use Tusu;
 
 sub startup {
     my $self = shift;
-    my $tusu = $self->plugin(tusu => {});
+    my $tusu = $self->plugin(TusuRenderer => {});
 }
 
 __END__

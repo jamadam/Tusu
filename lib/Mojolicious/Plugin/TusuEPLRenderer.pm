@@ -16,7 +16,7 @@ sub register {
 
       # Template
       my $inline = $options->{inline};
-      my $path = Tusu::_filename_trans($app->static->paths->[0], $conf->{directory_index}, '/'. $options->{template});
+      my $path = $self->filename_trans($app->static->paths->[0], '/'. $options->{template});
       $path = md5_sum encode('UTF-8', $inline) if defined $inline;
       return unless defined $path;
 
@@ -82,32 +82,6 @@ sub register {
     }
   );
 }
-    
-    ### ---
-    ### foo/bar.html    -> public_html/foo/bar.html
-    ### foo/            -> public_html/foo/index.html
-    ### foo             -> public_html/foo
-    ### ---
-    sub _filename_trans {
-        my ($template_base, $directory_index, $name) = @_;
-        $name ||= '';
-        my $leading_slash = substr($name, 0, 1) eq '/';
-        my $trailing_slash = substr($name, -1, 1) eq '/';
-        $name =~ s{^/}{};
-        my $dir;
-        if ($leading_slash) {
-            $dir = $template_base;
-        } else {
-            $dir = (File::Spec->splitpath(Text::PSTemplate->get_current_filename))[1];
-        }
-        my $path = File::Spec->catfile($dir, $name);
-        if ($trailing_slash) {
-            if (my $fixed_path = Tusu::_fill_filename($path, $directory_index)) {
-                return $fixed_path;
-            }
-        }
-        return $path;
-    }
 
 1;
 __END__

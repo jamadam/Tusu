@@ -28,7 +28,7 @@ sub register {
       my ($r, $c, $output, $options) = @_;
 
       # Generate name
-      my $path = Tusu::_filename_trans($app->static->paths->[0], $conf->{directory_index}, '/'. $options->{template});
+      my $path = $self->filename_trans($app->static->paths->[0], '/'. $options->{template});
       return unless defined $path;
       my $id = encode 'UTF-8', join(', ', $path, sort keys %{$c->stash});
       my $key = $options->{cache} = md5_sum $id;

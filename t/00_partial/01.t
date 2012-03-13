@@ -31,15 +31,17 @@ use Test::More tests => 13;
     }
     
     {
-        is(Tusu::_fill_filename('t/00_partial/f/t02', ['index.html']), 't/00_partial/f/t02/index.html');
-        is(Tusu::_fill_filename('t/00_partial/f/t02/', ['index.html']), 't/00_partial/f/t02/index.html');
-        is(Tusu::_fill_filename('t/00_partial/f/t02/a', ['index.html']), 't/00_partial/f/t02/a/index.html');
-        is(Tusu::_fill_filename('t/00_partial/f/t02/a/', ['index.html']), 't/00_partial/f/t02/a/index.html');
-        is(Tusu::_fill_filename('t/00_partial/f/t02/b/', ['index.html']), undef);
-        is(Tusu::_fill_filename('t/00_partial/f/t02', ['index2.html']), undef);
-        is(Tusu::_fill_filename('t/00_partial/f/t02/', ['index2.html']), undef);
-        is(Tusu::_fill_filename('t/00_partial/f/t02/a', ['index2.html']), undef);
-        is(Tusu::_fill_filename('t/00_partial/f/t02/a/', ['index2.html']), undef);
+		my $skelton = bless {directory_index => ['index.html']}, 'Tusu';
+        is($skelton->fill_filename('t/00_partial/f/t02', ['index.html']), 't/00_partial/f/t02/index.html');
+        is($skelton->fill_filename('t/00_partial/f/t02/', ['index.html']), 't/00_partial/f/t02/index.html');
+        is($skelton->fill_filename('t/00_partial/f/t02/a', ['index.html']), 't/00_partial/f/t02/a/index.html');
+        is($skelton->fill_filename('t/00_partial/f/t02/a/', ['index.html']), 't/00_partial/f/t02/a/index.html');
+        is($skelton->fill_filename('t/00_partial/f/t02/b/', ['index.html']), undef);
+		$skelton = bless {directory_index => ['index2.html']}, 'Tusu';
+        is($skelton->fill_filename('t/00_partial/f/t02', ['index2.html']), undef);
+        is($skelton->fill_filename('t/00_partial/f/t02/', ['index2.html']), undef);
+        is($skelton->fill_filename('t/00_partial/f/t02/a', ['index2.html']), undef);
+        is($skelton->fill_filename('t/00_partial/f/t02/a/', ['index2.html']), undef);
     }
 
 __END__
