@@ -30,7 +30,6 @@ our $VERSION = '0.02';
             directory_index         => ['index.html','index.htm'],
             error_document          => {},
             indexes                 => 0,
-            renderer                => 'tusu',
         }
     }
     
@@ -68,7 +67,7 @@ our $VERSION = '0.02';
                     ->route('/:template', template => qr{.*})
                     ->name('')
                     ->to(cb => sub {
-                        $_[0]->render(handler => $args->{renderer});
+                        $_[0]->render(handler => $self->handler);
                     });
             }
             $self->_dispatch($_[1]);

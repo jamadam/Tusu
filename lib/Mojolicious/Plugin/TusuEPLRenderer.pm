@@ -4,6 +4,8 @@ use Mojo::Base 'Tusu';
 use Mojo::Template;
 use Mojo::Util qw/encode md5_sum/;
 
+__PACKAGE__->attr('handler' => 'tusu_epl');
+
 sub register {
   my ($self, $app, $conf) = @_;
   

@@ -7,6 +7,7 @@ use Mojo::Base 'Tusu';
 use Carp;
 use Scalar::Util qw(weaken);
 
+    __PACKAGE__->attr('handler' => 'tusu');
     __PACKAGE__->attr('engine');
     
     sub default_args {
